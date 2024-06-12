@@ -4,11 +4,14 @@ pipeline {
         jdk 'java17'
         maven 'maven3'
     }
-
     environment {
-        SONARQUBE_URL = 'http://54.157.166.207:9000'
-        SONARQUBE_PROJECT_KEY = 'regester'
-        SONARQUBE_LOGIN_TOKEN = credentials('sonar-token')
+        APP_NAME = "register-app"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "gkamalakar06"
+        DOCKER_PASS = "docker-hub"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${$BUILD_NUMBER}"
+        
     }
 
     stages {
@@ -35,20 +38,17 @@ pipeline {
                 sh 'mvn test'
             }
         }
-
-        stage('SonarQube Analysis') {
+         stage('Build & Push Docker Image') {
             steps {
-                script {
-                    withSonarQubeEnv('sonar-token') {
-                        sh '''
-                            mvn sonar:sonar \
-                                -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
-                                -Dsonar.host.url=${SONARQUBE_URL} \
-                                -Dsonar.login=${SONARQUBE_LOGIN_TOKEN} \
-                                -Dsonar.java.binaries=.
-                        '''
-                    }
-                }
+               script {
+                   docker.withRegistry('.',DOCKER_PASS) {
+                       docker_image = docker.build "${IMAGE_NAME}"
+                   }
+                   docker.withRegistryy('.',DOCKER_PASS) {
+                       docker_image.push("${IMAGE_TAG}")
+                       docker_image.push('latest')
+                   }
+               }
             }
         }
     }
