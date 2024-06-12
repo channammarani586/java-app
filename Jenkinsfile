@@ -4,7 +4,13 @@ pipeline {
         jdk 'java17'
         maven 'maven3'
     }
- 
+      environment {
+        APP_NAME = "register-app"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "gkamalakar06"
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+       }
 
     stages {
         stage('Clean workspace') {
@@ -40,6 +46,18 @@ pipeline {
               }
            }
        }
+        
 
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
+                        def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                        dockerImage.push()
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
     }
 }
