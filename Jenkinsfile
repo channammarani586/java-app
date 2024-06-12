@@ -9,9 +9,8 @@ pipeline {
         RELEASE = "1.0.0"
         DOCKER_USER = "gkamalakar06"
         DOCKER_PASS = "docker-hub"
-        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${$BUILD_NUMBER}"
-        
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}" // Removed $ before BUILD_NUMBER
     }
 
     stages {
@@ -38,17 +37,16 @@ pipeline {
                 sh 'mvn test'
             }
         }
-         stage('Build & Push Docker Image') {
+
+        stage('Build & Push Docker Image') {
             steps {
-               script {
-                   docker.withRegistry('.',DOCKER_PASS) {
-                       docker_image = docker.build "${IMAGE_NAME}"
-                   }
-                   docker.withRegistryy('.',DOCKER_PASS) {
-                       docker_image.push("${IMAGE_TAG}")
-                       docker_image.push('latest')
-                   }
-               }
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_USER, DOCKER_PASS) {
+                        def docker_image = docker.build "${IMAGE_NAME}:${IMAGE_TAG}"
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
+                }
             }
         }
     }
