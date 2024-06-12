@@ -1,8 +1,8 @@
 pipeline {
-    agent any
-    tools {
-        jdk 'java17'
-        maven 'maven3'
+    agent {
+    docker {
+      image 'abhishekf5/maven-abhishek-docker-agent:v1'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
 
     stages {
@@ -49,6 +49,7 @@ pipeline {
              IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
              IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
              REGISTRY_CREDENTIALS = credentials('docker-hub')
+            
        }
             steps {
                 script {
