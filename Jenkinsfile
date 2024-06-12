@@ -1,8 +1,9 @@
 pipeline {
     agent {
-    docker {
-      image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+        docker {
+            image 'maven:3.9.0-eclipse-temurin-17'
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
 
     stages {
@@ -29,33 +30,31 @@ pipeline {
                 sh 'mvn test'
             }
         }
+
         stage('Static Code Analysis') {
-          environment {
-            SONAR_URL = "http://18.209.223.39:9000"
-           }
+            environment {
+                SONAR_URL = "http://18.209.223.39:9000"
+            }
             steps {
-              withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-              }
-           }
-       }
-        
+                withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+                }
+            }
+        }
 
         stage('Build & Push Docker Image') {
             environment {
-             APP_NAME = "register-app"
-             RELEASE = "1.0.0"
-             DOCKER_USER = "gkamalakar06"
-             IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-             REGISTRY_CREDENTIALS = credentials('docker-hub')
-            
-       }
+                APP_NAME = "register-app"
+                RELEASE = "1.0.0"
+                DOCKER_USER = "gkamalakar06"
+                IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+                IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+                REGISTRY_CREDENTIALS = credentials('docker-hub')
+            }
             steps {
                 script {
-                    sh 'docker build -t ${IMAGE_NAME} .'
-                        def  dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}") {
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub')
+                    def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
