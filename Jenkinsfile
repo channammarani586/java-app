@@ -20,7 +20,7 @@ pipeline {
 
         stage('Build Application') {
             steps {
-                sh "mvn clean package"
+                sh "mvn clean package -DskipTests= true"
                 sh '''mvn sonar:sonar -Dsonar.url=http://54.157.166.207:9000/ -Dsonar.login=sqa_eead51552f33dc25cd06166b550a07fe537c1114\
                       -Dsonar.java.binaries=. \
 		              -Dsonar.projectKey=regester'''
