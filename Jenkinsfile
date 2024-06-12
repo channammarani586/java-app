@@ -49,7 +49,7 @@ pipeline {
             steps {
                 script {
                     def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
+                    docker.withRegistry('.', 'docker-hub') {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
