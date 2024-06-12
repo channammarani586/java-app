@@ -1,8 +1,8 @@
 pipeline {
     agent {label 'jenkins-agent'}
     tools {
-	jdk 'java17'
-	maven 'maven3'
+        jdk 'java17'
+        maven 'maven3'
     }
 
     stages {
@@ -12,31 +12,33 @@ pipeline {
             }
         }
 
-	 stage('Checkout') {
+        stage('Checkout') {
             steps {
                 git branch: 'main', credentialsId: 'gitaccess', url: 'https://github.com/kamalakar22/register-app.git'
             }
         }
 
-	stage('Build Application') {
+        stage('Build Application') {
             steps {
-               sh "mvn clean package"
+                sh "mvn clean package"
             }
         }
 
-	stage('Test Application') {
+        stage('Test Application') {
             steps {
-               sh "mvn test"
+                sh "mvn test"
             }
         }
 
-	stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
-               script {
-	          withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token')
-		       sh "mvn sonar:sonar"
-	       }
+                script {
+                    withSonarQubeEnv('jenkins-sonarqube-token') {
+                        sh "mvn sonar:sonar"
+                    }
+                }
             }
         }
     }
 }
+
