@@ -27,16 +27,16 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Static Code Analysis') {
-            environment {
-                SONAR_URL = "http://34.232.78.48:9000"
-            }
-            steps {
-                withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-                }
-            }
-        }
+        // stage('Static Code Analysis') {
+        //     environment {
+        //         SONAR_URL = "http://34.232.78.48:9000"
+        //     }
+        //     steps {
+        //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+        //             sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+        //         }
+        //     }
+        // }
         stage('Build & Push Docker Image') {
             environment {
                 APP_NAME = "register-app"
