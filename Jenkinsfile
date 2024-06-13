@@ -37,19 +37,19 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Build  Docker Image') {
-            environment {
+           stages {
+              stage('Build  Docker Image') {
+              environment {
                 APP_NAME = "register-app"
                 RELEASE = "1.0.0"
                 DOCKER_USER = "gkamalakar06"
                 IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
                 IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-                REGISTRY_CREDENTIALS = credentials('docker-hub')
+                
             }
-            steps {
-                script {
+              steps {
+                 script {
                     sh dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                    
                 }
             }
         }
