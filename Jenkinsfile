@@ -37,7 +37,7 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Build & Push Docker Image') {
+        stage('Build  Docker Image') {
             environment {
                 APP_NAME = "register-app"
                 RELEASE = "1.0.0"
@@ -48,11 +48,8 @@ pipeline {
             }
             steps {
                 script {
-                    def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                    docker.withRegistry('.', 'docker-hub') {
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
+                    sh dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    
                 }
             }
         }
