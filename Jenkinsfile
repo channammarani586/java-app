@@ -35,7 +35,7 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             environment {
                 APP_NAME = "register-app"
                 RELEASE = "1.0.0"
@@ -45,22 +45,10 @@ pipeline {
             }
             steps {
                 script {
-                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            environment {
-                DOCKER_USER = "gkamalakar06"
-                APP_NAME = "register-app"
-                IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-                IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-            }
-            steps {
-                script {
+                    def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                     withCredentials([string(credentialsId: 'dockerhub-cred', variable: 'DOCKERHUB_CRED')]) {
-                        sh 'docker login -u ${DOCKER_USER} -p ${DOCKERHUB_CRED}'
-                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh 'echo $DOCKERHUB_CRED | docker login -u $DOCKER_USER --password-stdin'
+                        dockerImage.push("${IMAGE_TAG}")
                         dockerImage.push('latest')
                     }
                 }
