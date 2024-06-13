@@ -49,5 +49,22 @@ pipeline {
                 }
             }
         }
+        stage('Push Docker Image') {
+            environment {
+                DOCKER_USER = "gkamalakar06"
+                APP_NAME = "register-app"
+                IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+                IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+            }
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub-cred', variable: 'DOCKERHUB_CRED')]) {
+                        sh 'docker login -u ${DOCKER_USER} -p ${DOCKERHUB_CRED}'
+                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
     }
 }
