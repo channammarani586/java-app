@@ -7,7 +7,7 @@ pipeline {
     stages{
         stage('SCM'){
             git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/kamalakar22/register-app.git'
-            cd register-app
+            
         }
     }
 }
