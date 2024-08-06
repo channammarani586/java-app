@@ -15,6 +15,7 @@ pipeline {
          stage("Trivy"){
             steps {
                 sh "trivy fs --format table -o trivy-fs-report.html ."
+                archiveArtifacts artifacts: 'trivy-fs-report.html', followSymlinks: false
             }
 
        }
