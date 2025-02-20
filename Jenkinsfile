@@ -14,13 +14,13 @@ pipeline {
         }
         stage('Build Application') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean install'
             }
         }
 
-        stage('Test Application') {
+        stage('Docker build') {
             steps {
-                sh 'mvn test'
+                sh 'docker build -t register-app .'
             }
         }
     }
