@@ -1,5 +1,6 @@
 pipeline {
-    agent { label 'Jenkins-Agent' }
+    agent 
+       any {}
     
     tools {
         jdk 'jdk'
@@ -9,16 +10,9 @@ pipeline {
     stages {
         stage('SCM') {
             steps {
-                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/kamalakar22/register-app.git'
+                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/PrajwalW07/register-app.git'
             }
         }
-         stage("Trivy"){
-            steps {
-                sh "trivy fs --format table -o trivy-fs-report.html ."
-                archiveArtifacts artifacts: 'trivy-fs-report.html', followSymlinks: false
-            }
-
-       }
         stage("Build Application"){
             steps {
                 sh "mvn clean package"
