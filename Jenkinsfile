@@ -59,7 +59,7 @@ pipeline {
             steps {
                 script {
                     // Set up Kubernetes access and deploy to "test" namespace
-                    sh 'kubectl --kubeconfig=${KUBE_CONFIG} apply -f k8s/deployment.yaml -n test'
+                    sh 'kubectl --kubeconfig=${KUBE_CONFIG} apply -f /home/maste/Desktop/deployment.yaml -n test'
                 }
             }
         }
